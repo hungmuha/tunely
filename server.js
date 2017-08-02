@@ -131,10 +131,12 @@ app.post('/api/albums/:album_id/songs',function postThat(req,res){
 app.get('/api/albums/:id',function updateAlbum(req,res){
   var id= req.params.id;
   console.log("hit the get route to update");
-  db.Album.findOne({_id:id}),function(err,album) {
-    if(err){console.log(err);}
-    res.json(album);
-  };
+  db.Album.findById(id)
+    .exec(function(err,album) {
+      console.log('finding that album by Id')
+     if(err){console.log(err);}
+     res.json(album);
+    });
 });
 /**********
  * SERVER *
