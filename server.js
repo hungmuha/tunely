@@ -102,6 +102,40 @@ app.post('/api/albums',function postThat(req,res){
     res.json(req.body);
     console.log('done');
 });
+
+
+//posting new song
+app.post('/api/albums/:album_id/songs',function postThat(req,res){
+  console.log(" new song HIT");
+  console.log(req.body);
+  var id=req.params.album_id;
+  console.log(id);
+
+  db.Album.findById(id)
+    .exec(function(err, foundAlbum){
+    if(err){ return console.log(err);}
+
+    foundAlbum.songs.push(
+      {name: req.body.name,
+      trackNumber: req.body.trackNumber});
+
+    foundAlbum.save(function(err){
+      
+      res.json(foundAlbum);
+
+      });   
+   });
+});
+
+//get the new updated album
+app.get('/api/albums/:id',function updateAlbum(req,res){
+  var id= req.params.id;
+  console.log("hit the get route to update");
+  db.Album.findOne({_id:id}),function(err,album) {
+    if(err){console.log(err);}
+    res.json(album);
+  };
+});
 /**********
  * SERVER *
  **********/

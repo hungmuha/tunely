@@ -5,7 +5,7 @@ var Song= require('./song');
 
 
 var albumSchema = new Schema({
-  songs: [{trackNumer: Number,name:String}],
+  songs: [Song.schema],
   artistName: String,
   name: String,
   releaseDate: String,

@@ -48,11 +48,12 @@ $(document).ready(function() {
      });
   });
     addAlbum();
+    addSong();
 });
 
 function addAlbum(){
   $('form').on('submit', function(event){
-    event.preventDefault;
+    event.preventDefault();
     console.log('submit');
     var formData=$(this).serialize();
     $.ajax({
@@ -66,7 +67,83 @@ function addAlbum(){
     console.log(formData);
     $(this).trigger('reset');
   });
- 
+}
+
+
+function addSong(){
+$('#albums').on('click', '.add-song', function() {
+    console.log('asdfasdfasdf');
+    var id= $(this).parents('.album').data('album-id'); // "5665ff1678209c64e51b4e7b"
+    console.log('id',id);
+$('#songModal').data('album-id', id).modal();
+    handleNewSongSubmit(id);
+});
+  
+}
+
+
+function handleNewSongSubmit(album_Id){
+  $('#saveSong').on('click',function(event){
+    event.preventDefault();
+    console.log('modal working!!!');
+
+    
+    var songName = $('#songName').val();
+    var trackNumber=$('#trackNumber').val();
+    var parseNumber = parseInt(trackNumber);
+    var songData = {'name' : songName, 'trackNumber': parseNumber};
+    
+    console.log(songData);
+
+    var postUrl = "/api/albums/"+album_Id+"/songs";
+
+    $.ajax({
+      method:"post",
+      url: postUrl,
+      data:songData,
+      success: function (){
+        $.get('/api/albums/'+album_Id)
+            .done(function(data){ 
+            console.log("success added Song");
+            var removeOld = $('div').find("[data-album-id="+album_Id+"]");
+       
+                    console.log(removeOld);
+                    removeOld.remove();
+        
+                    renderAlbum(data);
+                   });
+                }
+    });
+      $('#songName').val('');
+      $('#trackNumber').val('');
+      $('#songModal').modal('hide');
+
+    // $('modal').trigger('reset');
+
+  });
+}
+
+// function successAddSong (album_Id){
+//    $.get('/api/albums/'+album_Id)
+//     .done(function(data){
+//       console.log("success added Song");
+//       var removeOld = $('div').find("[data-album-id="+album_Id+"]");
+//       console.log(removeOld);
+//       removeOld.remove();
+//       renderAlbum(data);
+//       $('#songName').val('');
+//       $('#trackNumber').val('');
+//       $('#songModal').modal('hide');
+//     });
+// }
+
+function buildSongHtml(songs){
+  var songText=" - ";
+  songs.forEach(function(song){
+    songText = songText+ '('+ song.trackNumber+') '+ song.name + ' - ' ;
+  });
+  var songsHtml = " "+ songText +" ";
+  return songsHtml;
 }
 
 
@@ -78,11 +155,12 @@ function renderAlbum(album) {
 
   var albumHtml =
   "        <!-- one album -->" +
-  "        <div class='row album' data-album-id='" + "HARDCODED ALBUM ID" + "'>" +
+  "        <div class='row album' data-album-id='" + album._id  + "'>" +
   "          <div class='col-md-10 col-md-offset-1'>" +
   "            <div class='panel panel-default'>" +
   "              <div class='panel-body'>" +
   "              <!-- begin album internal row -->" +
+ 
   "                <div class='row'>" +
   "                  <div class='col-md-3 col-xs-12 thumbnail album-art'>" +
   "                     <img src='" + "http://placehold.it/400x400'" +  " alt='album image'>" +
@@ -101,6 +179,11 @@ function renderAlbum(album) {
   "                        <h4 class='inline-header'>Released date:</h4>" +
   "                        <span class='album-releaseDate'>" + album.releaseDate + "</span>" +
   "                      </li>" +
+  "                      <li class='list-group-item'>" +
+  "                        <h4 class='inline-header'>Songs:</h4>"+
+  "                        <span>" + buildSongHtml(album.songs) + "</span>"+
+  "                        </li>"+
+
   "                    </ul>" +
   "                  </div>" +
   "                </div>" +
@@ -109,6 +192,7 @@ function renderAlbum(album) {
   "              </div>" + // end of panel-body
 
   "              <div class='panel-footer'>" +
+  "               <button class='btn btn-primary add-song'>Add Song</button>"
   "              </div>" +
 
   "            </div>" +

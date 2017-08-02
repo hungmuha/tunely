@@ -56,28 +56,18 @@ sampleSongs.push({ name: 'Stronger',
                    trackNumber: 7
 });
 
+albumsList.forEach(function(element){
+	element.songs= sampleSongs;
+});
 
 
 db.Album.remove({}, function(err, albums){
 
   db.Album.create(albumsList, function(err, albums){
     if (err) { return console.log('ERROR', err); }
-    //making song inside of album
-     db.Song.remove({},function(err,songs){
-    	console.log("remove all song");
-    	sampleSongs.forEach(function(err,songs){
-    		var song = new db.Song({
-    			name: sampleSongs.name,
-    			trackNumber: sampleSongs.trackNumber
-    		});
-    	song.save();
-    	console.log(songs);
-    	});
-    	process.exit();
-  });
     console.log("all albums:", albums);
     console.log("created", albums.length, "albums");
-    process.exit();
-  });
 
+    process.exit();
+});
 });
